@@ -22,8 +22,11 @@ def predict_op(context, dependent_job=None):
         #context.log.info(f"test_data: {test_data}")
         arima_model = auto_arima(train_data["price_close"], start_p=1, start_d=1, start_q=0, max_p=5, max_d=5, max_q=5, start_P=0, start_D=1, start_Q=0, max_P=5, max_D=5, max_Q=5, m=11, seasonal=True, random_state=20, supress_warning=True, stepwise=True)
         predicted_data = pd.DataFrame(arima_model.predict(n_periods=7), index=test_data['dt'])
-        for row in predicted_data.itertuples():
-            result_data.append([symbol, row[0], decimal.Decimal(row[1])])
+        result_data.extend(
+            [symbol, row[0], decimal.Decimal(row[1])]
+            for row in predicted_data.itertuples()
+        )
+
     #context.log.info(f"result_data: {result_data}")
 
     schema = StructType([
